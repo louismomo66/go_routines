@@ -36,6 +36,14 @@ func main() {
 	color.Green("The shop is open for the day!")
 	//add barbers
 	shop.addBarber("Frank")
+	shop.addBarber("Tom")
+	shop.addBarber("Dan")
+	shop.addBarber("Fred")
+	shop.addBarber("Don")
+	shop.addBarber("Fred3")
+	shop.addBarber("Don4")
+	shop.addBarber("Fred5")
+	shop.addBarber("Don6")
 
 	//start the barbershop as a goroutine
 	shopClosing := make(chan bool)
