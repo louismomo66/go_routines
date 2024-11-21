@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"subscription/data"
 	"sync"
 
 	_ "github.com/jackc/pgconn"
@@ -12,7 +13,7 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-const webPort = "80"
+const webPort = "8080"
 
 func (app *Config) serve() {
 	srv := &http.Server{
@@ -41,15 +42,23 @@ func main() {
 	wg := sync.WaitGroup{}
 	//set up the application config
 	app := Config{
-		Session:  session,
-		DB:       db,
-		InfoLog:  infoLog,
-		ErrorLog: errorLog,
-		Wait:     &wg,
+		Session:       session,
+		DB:            db,
+		InfoLog:       infoLog,
+		ErrorLog:      errorLog,
+		Wait:          &wg,
+		Models:        data.New(db),
+		ErrorChan:     make(chan error),
+		ErrorChanDone: make(chan bool),
 	}
 
 	//set up mail
-
+	app.Mailer = app.createMail()
+	go app.listenForMail()
+	//listen for web connections
+	go app.listenForShutdown()
+	//listen for errors
+	go app.listenForErrors()
 	// listen for web connection
 	app.serve()
 }
